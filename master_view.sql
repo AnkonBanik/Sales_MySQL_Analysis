@@ -31,4 +31,8 @@ CREATE VIEW master_view AS
             JOIN
         practice.categories ca ON p.category_id = ca.category_id
     ORDER BY o.order_date DESC;
+    
+    
+    -- Table View
+    SELECT * FROM master_view;
 
