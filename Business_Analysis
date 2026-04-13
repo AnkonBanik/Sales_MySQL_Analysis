@@ -1,0 +1,79 @@
+USE practice;
+
+SELECT * FROM practice.master_view;
+
+
+-- Revenue by Product: "Which specific product has generated the most revenue for us so far?
+
+SELECT 
+    product_name, 
+    SUM(total_line_item_cost) as total_revenue
+FROM
+    master_view
+GROUP BY product_name
+ORDER BY Total_Revenue DESC
+;
+
+-- Order Frequency: "How many orders has each customer placed? List them from most frequent to least frequent."
+
+SELECT 
+    first_name, last_name, COUNT(DISTINCT order_id) as order_count 
+FROM
+    master_view
+
+GROUP BY customer_id
+ORDER BY order_count DESC;
+
+-- Recent Sales: "Show me all transactions that happened in the month of October, sorted by the most recent."
+
+SELECT 
+    *
+FROM
+    master_view
+WHERE
+    order_date BETWEEN '2023-10-01' AND '2023-10-31'
+ORDER BY order_date
+;
+
+
+-- Targeting Gen-Z: "We are running a campaign for customers under the age of 30. List their names and emails, but only if they’ve spent more than $50 total."
+
+SELECT 
+    first_name,
+    last_name,
+    age,
+    email,
+    SUM(total_line_item_cost) AS spent
+FROM
+    master_view
+
+WHERE age < 30
+GROUP BY customer_id
+HAVING spent > 50
+;
+
+-- Domain Analysis: "Are most of our customers using example.com emails? Group the total sales by the email provider (the part after the @)."
+SELECT 
+    SUBSTRING_INDEX(email, '@', -1) AS domain, 
+    SUM(total_line_item_cost) AS revenue
+FROM master_view
+GROUP BY domain; 
+
+-- Basket Size: "What is the average number of items per order? This helps us understand if customers are buying in bulk or single items."
+
+SELECT AVG(total_qty) AS avg_items_per_order
+FROM (
+    SELECT order_id, SUM(quantity) as total_qty 
+    FROM master_view 
+    GROUP BY order_id
+) AS order_totals;
+
+
+-- Category Performance: "Which category is our 'weakest link' in terms of total dollar sales? We might need to stop stocking those items."
+SELECT category_name, SUM(total_line_item_cost) AS total_sales
+FROM master_view
+GROUP BY category_name
+ORDER BY total_sales ASC;
+
+
+
